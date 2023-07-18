@@ -14,30 +14,163 @@
 <ul class="scifiUI">
   <li>
     <input type="radio" name="tab" id="tab1" checked>
-    <label for="tab1">Tab1</label>
+    <label for="tab1">反應計時器遊戲</label>
     <div class="section">
-     The user interface, in the industrial design field of human–machine interaction, is the space where interactions between humans and machines occur. The goal of this interaction is effective operation and control of the machine on the user's end, and feedback from the machine, which aids the operator in making operational decisions. Examples of this broad concept of user interfaces include the interactive aspects of computer operating systems, hand tools, heavy machinery operator controls, and process controls. The design considerations applicable when creating user interfaces are related to or involve such disciplines as ergonomics and psychology.
+      <pre>介紹：
+這個遊戲從按住按鈕開始。LED會隨機顯示集中顔色，當它來給你出紅色時，放開按鈕。液晶屏幕會從燈光轉紅
+開始計算，以微妙顯示您的反應時間。
+
+壓電揚聲器會不時發出一些聲響來妨礙您專心進行遊戲。如果太快放開按鈕的話，會看見熒幕顯示一些訊息，告
+訴您必須重新開始。</pre>
+     <pre>Component List
+1 x Arduino Uno R3
+1 x LCD 16 x 2
+1 x Piezo
+1 x RGB LED
+4 x 220 Ω Resistor
+1 x Pushbutton
+1 x 50 kΩ Potentiometer
+1 x 470 Ω Resistor</pre>
     </div>
   </li>
   <li>
     <input type="radio" name="tab" id="tab2" />
-    <label for="tab2">Tab2</label>
+    <label for="tab2">程式解釋</label>
     <div class="section">
-    User Experience (UX) involves a person's behaviors, attitudes, and emotions about using a particular product, system or service. User Experience includes the practical, experiential, affective, meaningful and valuable aspects of human-computer interaction and product ownership. Additionally, it includes a person’s perceptions of system aspects such as utility, ease of use and efficiency. User Experience may be considered subjective in nature to the degree that it is about individual perception and thought with respect to the system. User Experience is dynamic as it is constantly modified over time due to changing usage circumstances and changes to individual systems as well as the wider usage context in which they can be found.
+    <pre>//
+#include&lt;LiquidCrystal.h&lg;  // 引入LiquidCrystal庫，用於控制LCD顯示屏
+LiquidCrystal lcd(12,11,5,4,3,2);  // 創建LiquidCrystal物件，並指定引腳
+
+int LEDR=8;  // 定義紅色LED的引腳為8
+int LEDB=7;  // 定義藍色LED的引腳為7
+int LEDGr=6;  // 定義綠色LED的引腳為6
+int Button=1;  // 定義按鈕的引腳為1
+int COLOUR;  // 定義顏色變量
+int Beep;  // 定義蜂鳴器變量
+int PSE;  // 定義等待時間變量
+int TME;  // 定義時間變量
+int RTME=0;  // 定義反應時間變量
+
+void setup()  // 初始化設置
+{
+  lcd.begin(16,2);  // 設置LCD顯示屏的列和行數
+  pinMode(LEDR,OUTPUT);  // 設置紅色LED引腳為輸出
+  pinMode(LEDB,OUTPUT);  // 設置藍色LED引腳為輸出
+  pinMode(LEDGr,OUTPUT);  // 設置綠色LED引腳為輸出
+  pinMode(Button,INPUT);  // 設置按鈕引腳為輸入
+  digitalWrite(LEDR,LOW);  // 將紅色LED設置為關閉狀態
+  digitalWrite(LEDB,LOW);  // 將藍色LED設置為關閉狀態
+  digitalWrite(LEDGr,LOW);  // 將綠色LED設置為關閉狀態
+}
+
+void loop()  // 主循環
+{
+  lcd.clear();  // 清空LCD顯示屏
+  lcd.print("Hold Button to");  // 在第一行顯示"Hold Button to"
+  lcd.setCursor(0,1);  // 將光標移動到第二行
+  lcd.print("start.");  // 在第二行顯示"start."
+  
+  while (digitalRead(Button)==LOW)  // 等待按鈕被按下
+  {
+    tone(13,1200,30);  // 播放蜂鳴器聲音
+    delay(1400);  // 等待1.4秒
+    noTone(13);  // 停止播放聲音
+  }
+  
+  lcd.clear();  // 清空LCD顯示屏
+  digitalWrite(LEDR,HIGH);  // 打開紅色LED
+  digitalWrite(LEDB,HIGH);  // 打開藍色LED
+  digitalWrite(LEDGr,HIGH);  // 打開綠色LED
+  randomSeed(analogRead(0));  // 使用模擬輸入A0的值作為隨機種子
+  COLOUR=random(1,4);  // 生成1~3之間的隨機數作為顏色
+  PSE=random(500,1200);  // 生成500~1200之間的隨機數作為等待時間
+  
+  while(COLOUR !=1 && digitalRead(Button)==HIGH)  // 當顏色不是1且按鈕沒有被按下時
+  {
+    digitalWrite(LEDGr,HIGH);  // 打開綠色LED
+    digitalWrite(LEDB,HIGH);  // 打開藍色LED
+    delay(PSE);  // 等待一段時間
+    randomSeed(analogRead(0));  // 使用模擬輸入A0的值作為隨機種子
+    Beep=random(1,4);  // 生成1~3之間的隨機數作為蜂鳴器聲音
+    PSE=random(750,1200);  // 生成750~1200之間的隨機數作為等待時間
+    if(Beep==1)  // 如果隨機數是1
+    {
+      tone(13,1600,350);  // 播放蜂鳴器聲音
+      delay(750);  // 等待0.75秒
+      noTone(13);  // 停止播放聲音
+    }
+    if(COLOUR==2)  // 如果顏色是2
+    {
+      digitalWrite(LEDGr,LOW);  // 關閉綠色LED
+    }
+    if(COLOUR==3)  // 如果顏色是3
+    {
+      digitalWrite(LEDB,LOW);  // 關閉藍色LED
+    }
+    delay(PSE);  // 等待一段時間
+    randomSeed(analogRead(0));  // 使用模擬輸入A0的值作為隨機種子
+    COLOUR=random(1,4);  // 生成1~3之間的隨機數作為顏色
+  }
+  
+  if(COLOUR == 1 && digitalRead(Button) == HIGH)  // 如果顏色是1且按鈕沒有被按下
+  {
+    digitalWrite(LEDGr,HIGH);  // 打開綠色LED
+    digitalWrite(LEDB,HIGH);  // 打開藍色LED
+    delay(PSE);  // 等待一段時間
+    TME=millis();  // 記錄當前時間
+    digitalWrite(LEDR,LOW);  // 關閉紅色LED
+    while(digitalRead(Button)==HIGH)  // 等待按鈕被按下
+    {
+      delay(1);  // 等待1毫秒
+    }
+    lcd.display();  // 打開LCD顯示屏
+    RTME=millis()-TME;  // 計算反應時間
+    lcd.print("Reaction Time:");  // 在第一行顯示"Reaction Time:"
+    lcd.setCursor(0,1);  // 將光標移動到第二行
+    lcd.print(RTME);  // 在第二行顯示反應時間
+  }
+  
+  if(COLOUR!=1)  // 如果顏色不是1
+  {
+    lcd.print("Released too");  // 在第一行顯示"Released too"
+    lcd.setCursor(0,1);  // 將光標移動到第二行
+    lcd.print("soon !!!");  // 在第二行顯示"soon !!!"
+    tone(13,3000,1500);  // 播放蜂鳴器聲音
+    delay(500);  // 等待0.5秒
+    noTone(13);  // 停止播放聲音
+  }
+  
+  while(digitalRead(Button)==LOW)  // 等待按鈕被按下
+  {
+    delay(10);  // 等待10毫秒
+  }
+  
+  digitalWrite(LEDR,LOW);  // 關閉紅色LED
+  digitalWrite(LEDB,LOW);  // 關閉藍色LED
+  digitalWrite(LEDGr,LOW);  // 關閉綠色LED
+  lcd.clear();  // 清空LCD顯示屏
+  lcd.print("Hold Button to");  // 在第一行顯示"Hold Button to"
+  lcd.setCursor(0,1);  // 將光標移動到第二行
+  lcd.print("start.");  // 在第二行顯示"start."
+  int Time=0;  // 定義計時變量
+  delay(1000);  // 等待1秒
+}</pre>
     </div>
   </li>
   <li>
     <input type="radio" name="tab" id="tab3" />
-    <label for="tab3">Tab3</label>
+    <label for="tab3">視頻</label>
     <div class="section">
-      Interactive Design is defined as a user-oriented field of study that focuses on meaningful communication of media through cyclical and collaborative processes between people and technology. Successful interactive designs have simple, clearly defined goals, a strong purpose and intuitive screen interface.
+      Interactive
     </div>
   </li>
   <li>
     <input type="radio" name="tab" id="tab4" />
-    <label for="tab4">Tab4</label>
+    <label for="tab4">Tinkercad模擬</label>
     <div class="section">
-      In computer science, functional programming is a programming paradigm, a style of building the structure and elements of computer programs, that treats computation as the evaluation of mathematical functions and avoids changing state and mutable data. It is a declarative programming paradigm, which means programming is done with expressions. In functional code, the output value of a function depends only on the arguments that are input to the function, so calling a function f twice with the same value for an argument x will produce the same result f(x) both times. Eliminating side effects, i.e. changes in state that do not depend on the function inputs, can make it much easier to understand and predict the behavior of a program, which is one of the key motivations for the development of functional programming.
+      <img src="https://i.imgur.com/Zn5fBZt.png" alt="">
+      <br><br><br>
+      <h>LINK: </h><a href="https://www.tinkercad.com/things/lYgpEL9iCKr">https://www.tinkercad.com/things/lYgpEL9iCKr</a>
     </div>
   </li>
 </ul>
