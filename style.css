@@ -78,3 +78,12 @@ li .section {
   text-indent: 1em;
   transition: all 200ms ease-in-out;
 }
+
+img{
+  width: 1000px;
+  height: auto;
+}
+
+a{
+  color: white;
+}
