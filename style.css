@@ -10,7 +10,7 @@ html, body {
 .scifiUI {
   list-style: none;
   position: relative;
-  width: 600px;
+  width: auto;
   margin: 50px auto;
   padding: 0;
   font-size: 1em;
