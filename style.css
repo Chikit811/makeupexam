@@ -37,7 +37,7 @@ li input[type="radio"]:checked ~ label {
 li input[type="radio"]:checked ~ .section {
   filter: progid:DXImageTransform.Microsoft.Alpha(enabled=false);
   opacity: 1;
-  width: 500px auto;
+  width: auto;
   padding: 50px;
   border: 1px solid #00bebe;
   color: #00dcdc;
